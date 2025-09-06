@@ -1,0 +1,10 @@
+#files
+Makefile
+*.make
+*.cache
+compile_commands.json
+
+#folders
+bin/
+bin-int/
+obj/
