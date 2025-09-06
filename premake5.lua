@@ -1,6 +1,4 @@
 ---@diagnostic disable: undefined-global ( zed to avoid diagnostics on this file)
-require("Vendor/premake-Plugin/export-compile-commands")
-require("Vendor/premake-Plugin/merge-compile-commands")
 
 
 workspace "FlareWorkspace"
@@ -23,7 +21,7 @@ project "Flare"
     files { "%{prj.name}/src/**.h",
             "%{prj.name}/src/**.cpp" }
 
-    defines "FLARE_BUILD_DLL" -- to export the symbols when building the DLL
+    defines "FLARE_EXPORTS" -- to export the symbols when building the DLL
 
     filter { "configurations:Debug" }
         defines { "DEBUG" }
@@ -77,21 +75,9 @@ project "Sandbox"
         symbols "Off"
 
 
-    filter {}
+    filter {"system:windows"}
         postbuildcommands {
             ("{COPY} ../bin/" .. outputdir .. "/Flare/Flare.dll %{cfg.targetdir}")
         }
 
-    newaction {
-        trigger     = "merge-compile-commands",
-        description = "Merge all compile_commands/*.json into compile_commands.json",
-        execute     = function ()
-            -- Windows PowerShell merge without leading space/newline
-            os.execute('powershell -ExecutionPolicy Bypass -Command "' ..
-                '$files = Get-ChildItem compile_commands -Filter *.json; ' ..
-                '$all = @(); ' ..
-                'foreach ($f in $files) { $all += Get-Content $f.FullName | ConvertFrom-Json }; ' ..
-                '($all | ConvertTo-Json -Depth 10) | Set-Content -Encoding utf8 compile_commands.json"')
-        end
-    }
 
